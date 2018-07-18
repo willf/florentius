@@ -1,4 +1,4 @@
-# Paths through the Labyrinth of Florensis
+# Paths through the Labyrinth of Florentius
 
 Florentius was a tenth-century monk in northern Spain, a scribe and a good one. 
 
