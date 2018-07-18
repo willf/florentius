@@ -1,2 +1,2 @@
 # florensis
-Investigating Florensis's Labyrinth: See [The Investigation](https://github.com/willf/florensis/blob/master/florensis.md)
+Investigating Florentius's Labyrinth: See [The Investigation](https://github.com/willf/florensis/blob/master/investigation.md)

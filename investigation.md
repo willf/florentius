@@ -1,6 +1,6 @@
 # Paths through the Labyrinth of Florensis
 
-Florensis was a tenth-century monk in northern Spain, a scribe and a good one. 
+Florentius was a tenth-century monk in northern Spain, a scribe and a good one. 
 
 In one of the books he enscribed, he made a famous "labyrinth" page, with a matrix of letters (and other beautiful decorations).
 
