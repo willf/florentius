@@ -101,7 +101,7 @@
 
       function create_labyrinth(text, width = -1) {
         if (width < 0) {
-          width = text.length + 1;
+          width = Math.floor(text.length / 2);
         }
         const mirrored_text = mirror(text.split("").reverse().join(""));
         const start = Math.floor(mirrored_text.length / 2) + 1;
