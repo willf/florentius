@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Labyrinth</title>
+    <style>
+      body {
+        background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/323039/black-wood-small.jpg);
+        color: #ddd;
+        font-family: san-serif;
+        font-size: 26px;
+        font-weight: 600;
+        line-height: 1;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 40px;
+        font-weight: 700;
+        margin-top: 30px;
+      }
+      h2 {
+        font-size: 15px;
+        font-weight: 400;
+        margin-top: 10px;
+      }
+      input[type="text"] {
+        font-family: sans-serif;
+        padding: 5px;
+        font-size: 16px;
+        border: 1px solid gray;
+        border-radius: 5px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        width: 80%;
+      }
+
+      button {
+        font-family: sans-serif;
+        padding: 5px 10px;
+        font-size: 16px;
+        background-color: lightblue;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-bottom: 10px;
+      }
+      #labyrinth-container {
+        padding: 30px;
+        background-color: #820201;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .container {
+        background-color: #820201;
+        display: inline-block;
+        position: relative;
+        width: 20px;
+        height: 20px;
+        margin: 5px;
+      }
+      .diamond-shape {
+        background-color: lightblue;
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        transform: rotate(45deg);
+        border: 1px solid black;
+      }
+      .letter {
+        color: black;
+        font-family: serif;
+        font-size: 66%;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-45deg);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Forentius's Labyrinth</h1>
+    <label for="text-input">Phrase:</label>
+    <input
+      type="text"
+      id="text-input"
+      value="FLORENTIUMINDIGNUMMEMORARE"
+    /><br />
+    <label for="width-input">Width:</label>
+    <input type="number" id="width-input" value="-1" /><br />
+    <button id="generate-button">Generate labyrinth</button><br />
+    <div id="labyrinth-container"></div>
+    <script>
+      function mirror(s) {
+        return s.slice(0, -1) + s.split("").reverse().join("");
+      }
+
+      function create_labyrinth(text, width = -1) {
+        if (width < 0) {
+          width = text.length + 1;
+        }
+        const mirrored_text = mirror(text.split("").reverse().join(""));
+        const start = Math.floor(mirrored_text.length / 2) + 1;
+        const rows = text.length - Math.floor(width / 2);
+        const offset = Math.floor(width / 2) + 1;
+        const result = [];
+        for (let i = 0; i < rows; i++) {
+          const x = mirrored_text.slice(start - offset - i, start - i);
+          result.push(mirror(x));
+        }
+        return result;
+      }
+
+      const generateButton = document.getElementById("generate-button");
+      generateButton.addEventListener("click", () => {
+        const textInput = document.getElementById("text-input");
+        const widthInput = document.getElementById("width-input");
+        const labyrinthContainer = document.getElementById(
+          "labyrinth-container"
+        );
+        const text = textInput.value;
+        const width = parseInt(widthInput.value);
+        const labyrinth = create_labyrinth(text, width);
+        labyrinthContainer.innerHTML = "";
+        labyrinth.forEach((row) => {
+          const rowDiv = document.createElement("div");
+          rowDiv.style.whiteSpace = "nowrap";
+          row.split("").forEach((letter) => {
+            const containerDiv = document.createElement("div");
+            containerDiv.classList.add("container");
+            const diamondDiv = document.createElement("div");
+            diamondDiv.classList.add("diamond-shape");
+            const letterDiv = document.createElement("div");
+            letterDiv.classList.add("letter");
+            letterDiv.textContent = letter;
+            diamondDiv.appendChild(letterDiv);
+            containerDiv.appendChild(diamondDiv);
+            rowDiv.appendChild(containerDiv);
+          });
+          labyrinthContainer.appendChild(rowDiv);
+        });
+      });
+    </script>
+  </body>
+</html>
