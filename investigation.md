@@ -79,6 +79,8 @@ This algorithm will eventually terminate because the number of cells is limited.
 
 Running this algorithm over the current labyrinth, we get the answer to our question: **354,200**, or 2^3×5^2×7×11×23.
 
+Make your own [Labyrinth](https://willf.github.io/florentius/)!
+
 See it [live](https://observablehq.com/@wiseman/florensis-labyrinth)! (thanks to John Wiseman).
 
 CUM ❤️ GULIELMO FECIT ET SALVA EUM, DEUS
