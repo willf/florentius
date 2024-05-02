@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>The Labyrinth of Florentius</title>
+    <style>
+      body {
+        font-family: Georgia, sans-serif;
+        text-align: center;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 20px;
+      }
+
+      .matrix {
+        font-family: "Georgia", serif;
+        font-size: 20px;
+        line-height: 1;
+        text-align: center;
+        border: 2px solid black;
+        display: inline-block;
+        padding: 10px;
+        background-color: #f0e8d6;
+        margin-top: 20px;
+      }
+
+      .matrix span {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        margin: 1px;
+        border: 1px solid #b89c74;
+        background-color: #faf4ec;
+      }
+
+      input[type="text"] {
+        width: 300px;
+        padding: 10px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        margin-bottom: 10px;
+      }
+
+      input[type="range"] {
+        width: 200px;
+        margin-bottom: 10px;
+      }
+
+      #widthValue {
+        font-size: 16px;
+        font-weight: bold;
+        margin-left: 10px;
+        display: none;
+      }
+
+      h1 {
+        color: #333;
+        font-size: 28px;
+        margin-bottom: 20px;
+      }
+
+      label {
+        font-size: 18px;
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>The Labyrinth of Florentius</h1>
+
+    <div>
+      <label for="width">Width:</label>
+      <input
+        type="range"
+        id="width"
+        name="width"
+        min="1"
+        max="26"
+        value="13"
+        oninput="generateMatrix()"
+      />
+      <span id="widthValue">13</span>
+    </div>
+    <div>
+      <label for="text">Text:</label>
+      <input
+        type="text"
+        id="text"
+        name="text"
+        value="FLORENTIUMINDIGNUMMEMORARE"
+        oninput="generateMatrix()"
+      />
+    </div>
+
+    <div id="matrix" class="matrix"></div>
+
+    <script>
+      function createLabyrinth(text, remainder) {
+        const width = remainder * 2 + 1; // width of a row
+        const mirroredText = mirror(text.split("").reverse().join("")); // note reverse text first!
+        const start = Math.floor(mirroredText.length / 2) + 1; // get middle of text
+        const rows = text.length - Math.floor(width / 2); // get # of rows
+        const offset = Math.floor(width / 2) + 1; // how much offset
+        const result = [];
+
+        for (let i = 0; i < rows; i++) {
+          const x = mirroredText.slice(start - offset - i, start - i);
+          result.push(mirror(x));
+        }
+
+        return result;
+      }
+
+      function mirror(str) {
+        return str + str.split("").reverse().slice(1).join("");
+      }
+
+      function generateMatrix() {
+        const text = document.getElementById("text").value;
+        const width = parseInt(document.getElementById("width").value);
+        document.getElementById("widthValue").textContent = width;
+
+        const maxWidth = text.length;
+        document.getElementById("width").max = maxWidth;
+
+        const remainder = Math.floor((text.length - width) / 2);
+        const labyrinth = createLabyrinth(text, remainder);
+
+        const matrixElement = document.getElementById("matrix");
+        matrixElement.innerHTML = labyrinth
+          .map((row) =>
+            row
+              .split("")
+              .map((letter) => `<span>${letter}</span>`)
+              .join("")
+          )
+          .join("<br>");
+      }
+
+      generateMatrix();
+    </script>
+  </body>
+</html>
