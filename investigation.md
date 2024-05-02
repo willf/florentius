@@ -78,3 +78,6 @@ while queue is not empty:
 This algorithm will eventually terminate because the number of cells is limited. _Note_: it would not terminate if a cell is added to a path that was just visited -- in other words, if a loop is created -- but that doesn't happen in the current case.
 
 Running this algorithm over the current labyrinth, we get the answer to our question: **354,200**, or 2^3×5^2×7×11×23. 
+
+
+CUM ❤️ GULIELMO FECIT ET SALVA EUM, DEUS

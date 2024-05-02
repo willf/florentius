@@ -2,10 +2,12 @@ def mirror(s):
     return s[0:len(s)-1] + s[::-1]
 
 
-def create_labyrinth(text, remainder):
-    width = remainder * 2 + 1           # width of a row
+def create_labyrinth(text, width=-1):
+    if width < 0:
+        width = len(text) + 1
+    # width = remainder * 2 + 1           # width of a row
     mirrored_text = mirror(text[::-1])  # note reverse text first!
-    start = len(mirrored_text) // 2 + 1 # get middle of text 
+    start = len(mirrored_text) // 2 + 1 # get middle of text
     rows = len(text) - width // 2       # get # of rows
     offset = width // 2 + 1             # how much offset
     result = []
@@ -16,4 +18,4 @@ def create_labyrinth(text, remainder):
 
 text = 'FLORENTIUMINDIGNUMMEMORARE'
 
-print("\n".join(create_labyrinth(text, 13)))
+print("\n".join(create_labyrinth(text)))
