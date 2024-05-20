@@ -42,6 +42,8 @@
 # every path in the right side of the matrix has a corresponding path in the left side of the matrix, and vice versa.
 #
 
+import sys
+
 
 # Display code.
 # Display the matrix of the Florentian Labyrinth.
@@ -79,13 +81,16 @@ def display_right_matrix(S, P):
 
 
 class Cell:
-    def __init__(self, x, y, character):
-        self.x = x
-        self.y = y
+    def __init__(self, j, k, character):
+        self.j = j
+        self.k = k
         self.ch = character
 
     def __str__(self):
-        return "({},{},{})".format(self.x, self.y, self.ch)
+        return "({},{},{})".format(self.j, self.k, self.ch)
+
+    def __repr__(self):
+        return self.__str__()
 
 
 class Path:
@@ -104,10 +109,14 @@ class HalfLabyrinth:
         self.w = len(P)
         self.h = len(S) - self.w
         self.matrix = [
-            [Cell(j, k, S[abs(j + k)]) for j in range(0, self.w)]
-            for k in range(self.h + 1)
+            [Cell(j, k, S[abs(j + k)]) for k in range(0, self.w)]
+            for j in range(self.h + 1)
         ]
         self.paths = []
+        self.bfs = []
+
+        self.start = [self.retrieve(0, 0)]
+        self.initiate_bfs()
 
     def display(self):
         print(" ", end=" ")
@@ -120,6 +129,95 @@ class HalfLabyrinth:
                 print(self.matrix[j][k].ch, end=" ")
             print()
 
+    def path_matches(self, path):
+        s = "".join([Cell.ch for Cell in path.Cells])
+        return s == self.S
 
-lh = HalfLabyrinth("abcdefghijk", "abcde")
-lh.display()
+    def path_prefix_matches(self, path):
+        if not path.Cells:
+            return False
+        s = "".join([Cell.ch for Cell in path.Cells])
+        return self.S.startswith(s)
+
+    def retrieve(self, j, k):
+        try:
+            return self.matrix[j][k]
+        except IndexError:
+            return None
+
+    def up(self, Cell):
+        return self.retrieve(Cell.j - 1, Cell.k)
+
+    def down(self, Cell):
+        return self.retrieve(Cell.j + 1, Cell.k)
+
+    def right(self, Cell):
+        return self.retrieve(Cell.j, Cell.k + 1)
+
+    def left(self, Cell):
+        return self.retrieve(Cell.j, Cell.k - 1)
+
+    def neighbors(self, Cell):
+        ns = [self.right(Cell), self.down(Cell), self.left(Cell), self.up(Cell)]
+        ns = [n for n in ns if n]
+        return ns
+
+    def extend(self, path):
+        n = path.Cells[-1]
+        Cells = path.Cells
+        ns = self.neighbors(n)
+        paths = [Path(Cells + [n]) for n in ns]
+        goods = [p for p in paths if self.path_prefix_matches(p)]
+        if goods:
+            last = path.Cells[-1]
+            s = "".join([Cell.ch for Cell in path.Cells])
+            (j, k) = last.j, last.k
+            # print(
+            #     "Extending {} extending from ({}, {}) by {} Cell(s)".format(
+            #         s, j, k, len(goods)
+            #     )
+            # )
+        return goods
+
+    def initiate_bfs(self):
+        self.bfs = [Path([cell]) for cell in self.start]
+
+    def search(self):
+        while self.bfs:
+            path = self.bfs.pop(0)
+            if self.path_matches(path):
+                print("Found path: {}".format(path), end=" ")
+                if self.removable_path(path):
+                    print("Removable path!")
+                else:
+                    print("Not removable path!")
+                self.paths.append(path)
+            else:
+                self.bfs += self.extend(path)
+
+    def cell_in_last_row_but_not_last_column(self, cell):
+        return cell.j == self.h and cell.k != self.w - 1
+
+    def removable_path(self, path):
+        return any(
+            self.cell_in_last_row_but_not_last_column(cell) for cell in path.Cells
+        )
+
+    def removable_paths(self):
+        # return a list of paths that contain a cell *other* in the last row,
+        # other than the last cell in the last row.
+        return [path for path in self.paths if self.removable_path(path)]
+
+
+def main():
+    str = sys.argv[1] if len(sys.argv) > 1 else "abcdefghijk"
+    prefix = str[0 : int(sys.argv[2])] if len(sys.argv) > 2 else "abcde"
+    lh = HalfLabyrinth(str, prefix)
+    lh.display()
+    lh.search()
+    print(len(lh.paths))
+    print(len(lh.removable_paths()))
+
+
+if __name__ == "__main__":
+    main()
