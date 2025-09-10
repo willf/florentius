@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pascal’s Triangle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafc; /* Tailwind gray-50 */
+      }
+      #triangle-container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start; /* Align rows to the start */
+        gap: 8px; /* Space between rows */
+        padding-bottom: 2rem;
+        overflow-x: auto; /* Allow horizontal scrolling for large triangles */
+        padding: 1rem;
+      }
+      .triangle-row {
+        display: flex;
+        align-items: center; /* Vertically center row number with cells */
+        justify-content: center;
+        gap: 12px; /* Space between numbers in a row */
+        flex-shrink: 0;
+        min-height: 48px; /* Ensure consistent row height */
+      }
+      .row-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        font-weight: 600;
+        color: #64748b; /* slate-500 */
+        font-size: 0.9rem;
+        flex-shrink: 0;
+        margin-right: 1rem;
+      }
+      .column-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 30px;
+        font-weight: 600;
+        color: #94a3b8; /* slate-400 */
+        font-size: 0.8rem;
+        flex-shrink: 0;
+      }
+      .triangle-cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 9999px; /* Make it a circle */
+        --cell-bg-lightness: 98%; /* A very light default, close to white */
+        background-color: hsl(230, 50%, var(--cell-bg-lightness));
+        color: #334155; /* slate-700 */
+        font-weight: 500;
+        font-size: 1rem;
+        box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1),
+          0 1px 2px -1px rgb(0 0 0 / 0.1);
+        transition: all 0.2s ease-in-out;
+        flex-shrink: 0;
+        position: relative; /* Needed for z-index on hover */
+      }
+      .triangle-cell:hover {
+        transform: scale(1.15);
+        background-color: #e0e7ff; /* indigo-100 */
+        color: #4338ca; /* indigo-700 */
+        z-index: 30;
+      }
+      .parent-highlight {
+        box-shadow: 0 0 0 3px #fbbf24; /* amber-400 */
+        z-index: 10;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .triangle-cell {
+          width: 36px;
+          height: 36px;
+          font-size: 0.8rem;
+        }
+        .triangle-row {
+          gap: 8px;
+        }
+      }
+      @media (max-width: 480px) {
+        .triangle-cell {
+          width: 28px;
+          height: 28px;
+          font-size: 0.7rem;
+        }
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-8">
+    <div class="text-center mb-8 max-w-4xl mx-auto">
+      <h1 class="text-3xl md:text-4xl font-bold text-slate-800">
+        Pascal’s Triangle
+      </h1>
+      <p class="mt-2 text-slate-600">
+        Use the slider to set the number of rows (‘a’). Each cell value is a
+        binomial coefficient C(a, b), calculated as the sum of the two numbers
+        directly above it.
+      </p>
+    </div>
+
+    <div
+      class="max-w-md mx-auto p-4 bg-white rounded-lg shadow-sm flex flex-col justify-center items-center gap-4 mb-8"
+    >
+      <div class="flex items-center gap-4 w-full">
+        <label
+          for="rows-slider"
+          class="text-slate-700 font-medium whitespace-nowrap"
+          >Number of Rows:</label
+        >
+        <input
+          type="range"
+          id="rows-slider"
+          value="22"
+          min="10"
+          max="30"
+          class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer"
+        />
+        <span
+          id="slider-value"
+          class="font-semibold text-slate-700 w-8 text-center"
+          >22</span
+        >
+      </div>
+    </div>
+
+    <div id="triangle-container"></div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const container = document.getElementById("triangle-container");
+        const rowsSlider = document.getElementById("rows-slider");
+        const sliderValueEl = document.getElementById("slider-value");
+
+        let currentTriangleData = [];
+
+        function generatePascalTriangle(numRows) {
+          if (numRows <= 0) return [];
+          const triangle = [[1]];
+
+          for (let i = 1; i < numRows; i++) {
+            const prevRow = triangle[i - 1];
+            const newRow = [1];
+            for (let j = 1; j < i; j++) {
+              newRow.push(prevRow[j - 1] + prevRow[j]);
+            }
+            newRow.push(1);
+            triangle.push(newRow);
+          }
+          return triangle;
+        }
+
+        function displayTriangle(triangle) {
+          container.innerHTML = ""; // Clear previous triangle
+          const fragment = document.createDocumentFragment();
+
+          const lastRow =
+            triangle.length > 0 ? triangle[triangle.length - 1] : [1];
+          const maxValue = Math.max(...lastRow);
+          const logMax = maxValue > 1 ? Math.log10(maxValue) : 1;
+
+          // Add column header row
+          if (triangle.length > 0) {
+            const headerRow = document.createElement("div");
+            headerRow.className = "triangle-row";
+            headerRow.style.marginBottom = "8px";
+
+            // Add a spacer to align with the 'a=' labels.
+            const spacer = document.createElement("div");
+            spacer.className = "row-number";
+            spacer.style.opacity = "0"; // Make it invisible but take up space
+            headerRow.appendChild(spacer);
+
+            const numCols = Math.max(...triangle.map((r) => r.length));
+            for (let b = 0; b < numCols; b++) {
+              const colNumberEl = document.createElement("div");
+              colNumberEl.className = "column-number";
+              colNumberEl.textContent = `b=${b}`;
+              headerRow.appendChild(colNumberEl);
+            }
+            fragment.appendChild(headerRow);
+          }
+
+          triangle.forEach((row, a) => {
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "triangle-row";
+
+            const rowNumberEl = document.createElement("div");
+            rowNumberEl.className = "row-number";
+            rowNumberEl.textContent = `a=${a}`;
+            rowDiv.appendChild(rowNumberEl);
+
+            row.forEach((num, b) => {
+              const cellDiv = document.createElement("div");
+              cellDiv.className = "triangle-cell";
+              cellDiv.textContent = num.toLocaleString();
+              cellDiv.dataset.a = a;
+              cellDiv.dataset.b = b;
+
+              if (num > 1) {
+                const intensity = Math.log10(num) / logMax;
+                const lightness = 98 - 50 * intensity; // Varies from 98% (light) to 48% (dark)
+                cellDiv.style.setProperty(
+                  "--cell-bg-lightness",
+                  `${lightness}%`
+                );
+
+                if (lightness < 70) {
+                  cellDiv.style.color = "#f8fafc"; // Use a light color for text on dark backgrounds
+                }
+              }
+
+              // Dynamically adjust font size for large numbers
+              const numChars = cellDiv.textContent.length;
+              if (numChars > 9) {
+                cellDiv.style.fontSize = "0.55rem";
+              } else if (numChars > 6) {
+                cellDiv.style.fontSize = "0.65rem";
+              } else if (numChars > 4) {
+                cellDiv.style.fontSize = "0.8rem";
+              } else {
+                cellDiv.style.fontSize = ""; // Reset for smaller numbers
+              }
+
+              rowDiv.appendChild(cellDiv);
+            });
+            fragment.appendChild(rowDiv);
+          });
+          container.appendChild(fragment);
+
+          // Add hover listeners after cells are in the DOM
+          addHoverListeners();
+        }
+
+        function addHoverListeners() {
+          const cells = document.querySelectorAll(".triangle-cell");
+
+          cells.forEach((cell) => {
+            cell.addEventListener("mouseenter", () => {
+              const a = parseInt(cell.dataset.a);
+              const b = parseInt(cell.dataset.b);
+              if (a > 0) {
+                const parent1 = document.querySelector(
+                  `.triangle-cell[data-a="${a - 1}"][data-b="${b - 1}"]`
+                );
+                const parent2 = document.querySelector(
+                  `.triangle-cell[data-a="${a - 1}"][data-b="${b}"]`
+                );
+
+                if (parent1) parent1.classList.add("parent-highlight");
+                if (parent2) parent2.classList.add("parent-highlight");
+              }
+            });
+
+            cell.addEventListener("mouseleave", () => {
+              const a = parseInt(cell.dataset.a);
+              const b = parseInt(cell.dataset.b);
+              if (a > 0) {
+                const parent1 = document.querySelector(
+                  `.triangle-cell[data-a="${a - 1}"][data-b="${b - 1}"]`
+                );
+                const parent2 = document.querySelector(
+                  `.triangle-cell[data-a="${a - 1}"][data-b="${b}"]`
+                );
+                if (parent1) parent1.classList.remove("parent-highlight");
+                if (parent2) parent2.classList.remove("parent-highlight");
+              }
+            });
+          });
+        }
+
+        function updateTriangle() {
+          let numRows = parseInt(rowsSlider.value, 10);
+          sliderValueEl.textContent = numRows;
+          currentTriangleData = generatePascalTriangle(numRows);
+          displayTriangle(currentTriangleData);
+        }
+
+        // Initial generation
+        updateTriangle();
+
+        // Event listeners
+        rowsSlider.addEventListener("input", updateTriangle);
+      });
+    </script>
+  </body>
+</html>
