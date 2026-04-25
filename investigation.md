@@ -4,7 +4,8 @@ Florentius was a tenth-century monk in northern Spain, a scribe and a good one.
 
 In one of the books he enscribed, he made a famous "labyrinth" page, with a matrix of letters (and other beautiful decorations).
 
-![Forensis's Labyrinth](NAL 2169 FOL.21V.jpg)
+![Forensis's Labyrinth](NAL%202169%20FOL.21V.jpg)
+
 
 Let me repeat the letters here:
 
